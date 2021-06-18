@@ -1,7 +1,7 @@
 package com.github.eutkin
 
-import io.micronaut.core.type.Argument
 import io.micronaut.runtime.Micronaut.build
+import org.junit.jupiter.api.Assertions.assertEquals
 
 fun main(args: Array<String>) {
     build()
@@ -9,9 +9,9 @@ fun main(args: Array<String>) {
         .packages("com.github.eutkin")
         .start()
         .use { ctx ->
-            val property: Collection<String> =
-                ctx.getProperty("untrimmed", Argument.listOf(String::class.java)).get()
-            assert(property.toSet() == setOf("one", "two"))
+            val testBean = ctx.getBean(Test::class.java)
+            assertEquals(setOf("one", "two"), testBean.untrimmed)
+
         }
 
 }
