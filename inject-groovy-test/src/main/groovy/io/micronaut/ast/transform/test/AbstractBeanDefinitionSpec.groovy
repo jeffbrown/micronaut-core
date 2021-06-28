@@ -28,7 +28,9 @@ import io.micronaut.core.beans.BeanIntrospection
 import io.micronaut.core.io.scan.ClassPathResourceLoader
 import io.micronaut.inject.BeanDefinitionReference
 import io.micronaut.inject.ast.ClassElement
+import io.micronaut.inject.writer.BeanDefinitionReferenceWriter
 import io.micronaut.inject.writer.BeanDefinitionVisitor
+import io.micronaut.inject.writer.BeanDefinitionWriter
 import org.codehaus.groovy.ast.ASTNode
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.MethodNode
@@ -94,7 +96,7 @@ abstract class AbstractBeanDefinitionSpec extends Specification {
 
     @CompileStatic
     BeanDefinition buildBeanDefinition(String className, String classStr) {
-        def beanDefName= '$' + NameUtils.getSimpleName(className) + 'Definition'
+        def beanDefName= '$' + NameUtils.getSimpleName(className) + BeanDefinitionWriter.CLASS_SUFFIX
         def packageName = NameUtils.getPackageName(className)
         String beanFullName = "${packageName}.${beanDefName}"
 
@@ -109,7 +111,7 @@ abstract class AbstractBeanDefinitionSpec extends Specification {
 
     @CompileStatic
     BeanDefinition buildBeanDefinition(String packageName, String className, String classStr) {
-        def beanDefName= '$' + className + 'Definition'
+        def beanDefName= '$' + className + BeanDefinitionWriter.CLASS_SUFFIX
         String beanFullName = "${packageName}.${beanDefName}"
 
         def classLoader = new InMemoryByteCodeGroovyClassLoader()
@@ -128,7 +130,7 @@ abstract class AbstractBeanDefinitionSpec extends Specification {
      * @return The bean definition
      */
     protected BeanDefinition buildInterceptedBeanDefinition(String className, String cls) {
-        def beanDefName= '$$' + NameUtils.getSimpleName(className) + 'Definition' + BeanDefinitionVisitor.PROXY_SUFFIX + 'Definition'
+        def beanDefName= '$$' + NameUtils.getSimpleName(className) + BeanDefinitionWriter.CLASS_SUFFIX + BeanDefinitionVisitor.PROXY_SUFFIX + BeanDefinitionWriter.CLASS_SUFFIX
         def packageName = NameUtils.getPackageName(className)
         String beanFullName = "${packageName}.${beanDefName}"
 
@@ -143,7 +145,7 @@ abstract class AbstractBeanDefinitionSpec extends Specification {
      * @return The bean definition
      */
     protected BeanDefinitionReference buildInterceptedBeanDefinitionReference(String className, String cls) {
-        def beanDefName= '$$' + NameUtils.getSimpleName(className) + 'Definition' + BeanDefinitionVisitor.PROXY_SUFFIX + 'DefinitionClass'
+        def beanDefName= '$$' + NameUtils.getSimpleName(className) + BeanDefinitionWriter.CLASS_SUFFIX + BeanDefinitionVisitor.PROXY_SUFFIX + BeanDefinitionWriter.CLASS_SUFFIX + BeanDefinitionReferenceWriter.REF_SUFFIX
         def packageName = NameUtils.getPackageName(className)
         String beanFullName = "${packageName}.${beanDefName}"
 
@@ -248,7 +250,7 @@ abstract class AbstractBeanDefinitionSpec extends Specification {
             protected List<BeanDefinitionReference> resolveBeanDefinitionReferences(Predicate<BeanDefinitionReference> predicate) {
                 def references =  classLoader.generatedClasses.keySet()
                     .stream()
-                    .filter({ name -> name.endsWith("DefinitionClass") })
+                    .filter({ name -> name.endsWith(BeanDefinitionWriter.CLASS_SUFFIX + BeanDefinitionReferenceWriter.REF_SUFFIX) })
                     .map({ name -> (BeanDefinitionReference) classLoader.loadClass(name).newInstance() })
                     .filter({ bdr -> predicate == null || predicate.test(bdr) })
                     .collect(Collectors.toList())
