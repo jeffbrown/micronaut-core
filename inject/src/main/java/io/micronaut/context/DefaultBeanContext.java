@@ -1025,13 +1025,10 @@ public class DefaultBeanContext implements BeanContext {
             }
             Argument[] requiredArguments = ((ParametrizedBeanFactory) definition).getRequiredArguments();
             argumentValues = new LinkedHashMap<>(requiredArguments.length);
-            BeanResolutionContext.Path path = resolutionContext.getPath();
+            BeanResolutionContext.Path currentPath = resolutionContext.getPath();
             for (int i = 0; i < requiredArguments.length; i++) {
                 Argument<?> requiredArgument = requiredArguments[i];
-                try {
-                    path.pushConstructorResolve(
-                            definition, requiredArgument
-                    );
+                try (BeanResolutionContext.Path ignored = currentPath.pushConstructorResolve(definition, requiredArgument)) {
                     Class<?> argumentType = requiredArgument.getType();
                     if (args.length > i) {
                         Object val = args[i];
@@ -1059,8 +1056,6 @@ public class DefaultBeanContext implements BeanContext {
                             }
                         }
                     }
-                } finally {
-                    path.pop();
                 }
             }
         } else {
