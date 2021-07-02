@@ -20,6 +20,7 @@ import io.micronaut.context.env.Environment
 import io.micronaut.core.annotation.AnnotationUtil
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.RxHttpClient
+import io.micronaut.inject.writer.BeanDefinitionWriter
 import io.micronaut.runtime.server.EmbeddedServer
 import spock.lang.Specification
 
@@ -41,10 +42,10 @@ class BeansEndpointSpec extends Specification {
 
         then:
         response.code() == HttpStatus.OK.code
-        beans["io.micronaut.management.endpoint.beans.\$BeansEndpointDefinition"].dependencies.contains("io.micronaut.context.BeanContext")
-        beans["io.micronaut.management.endpoint.beans.\$BeansEndpointDefinition"].dependencies.contains("io.micronaut.management.endpoint.beans.BeanDefinitionDataCollector")
-        beans["io.micronaut.management.endpoint.beans.\$BeansEndpointDefinition"].scope == AnnotationUtil.SINGLETON
-        beans["io.micronaut.management.endpoint.beans.\$BeansEndpointDefinition"].type == "io.micronaut.management.endpoint.beans.BeansEndpoint"
+        beans["io.micronaut.management.endpoint.beans.\$BeansEndpoint" + BeanDefinitionWriter.CLASS_SUFFIX].dependencies.contains("io.micronaut.context.BeanContext")
+        beans["io.micronaut.management.endpoint.beans.\$BeansEndpoint" + BeanDefinitionWriter.CLASS_SUFFIX].dependencies.contains("io.micronaut.management.endpoint.beans.BeanDefinitionDataCollector")
+        beans["io.micronaut.management.endpoint.beans.\$BeansEndpoint" + BeanDefinitionWriter.CLASS_SUFFIX].scope == AnnotationUtil.SINGLETON
+        beans["io.micronaut.management.endpoint.beans.\$BeansEndpoint" + BeanDefinitionWriter.CLASS_SUFFIX].type == "io.micronaut.management.endpoint.beans.BeansEndpoint"
 
         cleanup:
         rxClient.close()

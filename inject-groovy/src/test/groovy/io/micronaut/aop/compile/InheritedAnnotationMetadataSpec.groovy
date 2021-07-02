@@ -20,6 +20,7 @@ import io.micronaut.context.ApplicationContext
 import io.micronaut.core.annotation.Blocking
 import io.micronaut.inject.BeanDefinition
 import io.micronaut.inject.writer.BeanDefinitionVisitor
+import io.micronaut.inject.writer.BeanDefinitionWriter
 
 /**
  * @author graemerocher
@@ -59,7 +60,7 @@ interface MyInterface {
 
     void "test that annotation metadata is inherited from overridden methods for around advice"() {
         when:
-        BeanDefinition beanDefinition = buildBeanDefinition('inheritmetadatatest2.$MyBean2Definition$Intercepted', '''
+        BeanDefinition beanDefinition = buildBeanDefinition('inheritmetadatatest2.$MyBean2' + BeanDefinitionWriter.CLASS_SUFFIX + BeanDefinitionWriter.PROXY_SUFFIX, '''
 package inheritmetadatatest2;
 
 import io.micronaut.aop.interceptors.*;
@@ -99,7 +100,7 @@ interface MyInterface2 {
 
     void "test that a bean definition is not created for an abstract class"() {
         when:
-        ApplicationContext ctx = buildContext('inheritmetadatatest3.$BaseServiceDefinition$Intercepted', '''
+        ApplicationContext ctx = buildContext('inheritmetadatatest3.$BaseService' + BeanDefinitionWriter.CLASS_SUFFIX + BeanDefinitionWriter.PROXY_SUFFIX, '''
 package inheritmetadatatest3;
 
 import io.micronaut.aop.*;
@@ -157,19 +158,19 @@ class SomeInterceptor implements MethodInterceptor<Object, Object>, Ordered {
         ctx.getBean(clazz)
 
         when:
-        ctx.classLoader.loadClass("inheritmetadatatest3.\$BaseServiceDefinition\$Intercepted")
+        ctx.classLoader.loadClass("inheritmetadatatest3.\$BaseService" + BeanDefinitionWriter.CLASS_SUFFIX + BeanDefinitionWriter.PROXY_SUFFIX)
 
         then:
         thrown(ClassNotFoundException)
 
         when:
-        ctx.classLoader.loadClass("inheritmetadatatest3.\$BaseServiceDefinition")
+        ctx.classLoader.loadClass("inheritmetadatatest3.\$BaseService" + BeanDefinitionWriter.CLASS_SUFFIX)
 
         then:
         thrown(ClassNotFoundException)
 
         when:
-        ctx.classLoader.loadClass("inheritmetadatatest3.\$BaseAnnotatedServiceDefinition")
+        ctx.classLoader.loadClass("inheritmetadatatest3.\$BaseAnnotatedService" + BeanDefinitionWriter.CLASS_SUFFIX)
 
         then:
         thrown(ClassNotFoundException)
