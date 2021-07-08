@@ -2,4 +2,4 @@ micronaut:
   application:
     name: untrimmedCollectionItem
 
-untrimmed: one, two
+untrimmed: [one, two]
